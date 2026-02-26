@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>小红书心理学内容生成器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #fdf6ec;
+      --bg-alt: #fff0f5;
+      --card-bg: #ffffff;
+      --primary: #e8a0a0;
+      --primary-strong: #f28b82;
+      --primary-soft: rgba(232, 160, 160, 0.16);
+      --accent-apricot: #f5c9a0;
+      --accent-rose: #f7c6c7;
+      --text-main: #5c3d2e;
+      --text-sub: #8c6b5b;
+      --border: rgba(238, 205, 186, 0.9);
+      --radius-lg: 18px;
+      --shadow-soft: 0 16px 45px rgba(209, 160, 132, 0.22);
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-sans);
+      background:
+        radial-gradient(circle at top left, rgba(255, 244, 236, 0.98), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(255, 230, 236, 0.9), transparent 55%),
+        linear-gradient(135deg, #fdf6ec 0%, #fff0f5 55%, #ffe9dd 100%);
+      color: var(--text-main);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1180px;
+      padding: 28px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .app-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .app-title-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #fff5f6, #e8a0a0);
+      box-shadow: 0 0 0 4px rgba(248, 213, 213, 0.9), 0 0 18px rgba(232, 160, 160, 0.8);
+    }
+
+    .title-main {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: none;
+      color: #5c3d2e;
+    }
+
+    .title-sub {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .app-badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 11px;
+    }
+
+    .badge-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(241, 200, 176, 0.9);
+      background: linear-gradient(135deg, #fff9f4, #ffe9df);
+      color: #8c6b5b;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-pill span {
+      font-size: 11px;
+      letter-spacing: 0.03em;
+      color: #b07a60;
+    }
+
+    .badge-pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #ffe4e6, #e8a0a0);
+    }
+
+    .app-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .app-actions-note {
+      font-size: 11px;
+      color: #b07a60;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr);
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        padding: 18px 14px 26px;
+      }
+
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .app-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .app-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border-radius: 22px;
+      padding: 20px 20px 18px;
+      box-shadow: 0 14px 40px rgba(221, 178, 153, 0.35);
+      border: 1px solid rgba(241, 210, 190, 0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(249, 217, 207, 0.6), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(252, 228, 236, 0.7), transparent 50%);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .panel-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 8px;
+    }
+
+    .title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+    }
+
+    .title-pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #fff7f2;
+      color: #b36b5e;
+      font-weight: 500;
+      border: 1px solid rgba(241, 204, 187, 0.9);
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+      line-height: 1.7;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .keyword-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 9px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(238, 205, 186, 0.95);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.16s ease;
+      background: #fffaf5;
+      color: var(--text-main);
+    }
+
+    input[type="text"]:focus {
+      border-color: rgba(232, 160, 160, 0.9);
+      box-shadow: 0 0 0 1px rgba(232, 160, 160, 0.4);
+      background: #ffffff;
+    }
+
+    input::placeholder {
+      color: #c2a294;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      background:
+        linear-gradient(135deg, #f7c6c7 0%, #e8a0a0 40%, #f5c9a0 100%);
+      background-size: 180% 180%;
+      color: #5c3d2e;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 10px 26px rgba(232, 160, 160, 0.5);
+      transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease, background-position 0.5s ease;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 34px rgba(219, 150, 135, 0.55);
+      filter: brightness(1.03);
+      background-position: 100% 0;
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 18px rgba(202, 140, 125, 0.5);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      filter: grayscale(0.1);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #b07a60;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      align-items: center;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #fff8f3;
+      font-size: 11px;
+      color: #8c6b5b;
+      cursor: pointer;
+      border: 1px solid rgba(238, 205, 186, 0.9);
+      transition: all 0.12s ease;
+      user-select: none;
+    }
+
+    .chip:hover {
+      background: #ffefe5;
+      border-color: rgba(232, 160, 160, 0.9);
+    }
+
+    .chip.primary {
+      background: linear-gradient(135deg, #ffe1dd, #f7c6c7);
+      color: #5c3d2e;
+      border-color: rgba(232, 160, 160, 1);
+      box-shadow: 0 0 0 1px rgba(232, 160, 160, 0.4);
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #b07a60;
+      margin-top: 6px;
+    }
+
+    .badge-soft {
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #fff8f3;
+      color: #b07a60;
+      font-size: 11px;
+      border: 1px solid rgba(238, 205, 186, 0.9);
+    }
+
+    .badge-soft strong {
+      color: #8c5c45;
+    }
+
+    .results-panel {
+      position: relative;
+    }
+
+    .results-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .results-meta {
+      font-size: 11px;
+      color: #b07a60;
+    }
+
+    .results-meta strong {
+      color: #8c5c45;
+    }
+
+    .actions-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ghost-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(238, 205, 186, 0.95);
+      background: #fff8f3;
+      color: #8c6b5b;
+      font-size: 11px;
+      padding: 6px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .ghost-btn:hover {
+      background: #ffefe5;
+      border-color: rgba(232, 160, 160, 0.9);
+    }
+
+    .posts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 540px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .post-card {
+      border-radius: var(--radius-lg);
+      padding: 14px 14px 12px;
+      background:
+        linear-gradient(135deg, #fffdf9, #fff6f2);
+      border: 1px solid rgba(241, 210, 190, 0.9);
+      position: relative;
+      box-shadow: 0 12px 30px rgba(221, 178, 153, 0.55);
+    }
+
+    .post-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(247, 198, 199, 0.3), transparent 45%, rgba(245, 201, 160, 0.25));
+      opacity: 0.85;
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+    }
+
+    .post-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .post-index {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 10px;
+      color: #ae6b5a;
+      background: #fff5f0;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(232, 160, 160, 0.8);
+    }
+
+    .post-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.5;
+      color: #5c3d2e;
+    }
+
+    .post-body {
+      font-size: 12px;
+      color: #7a5542;
+      white-space: pre-line;
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+
+    .post-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #fff0f5;
+      color: #ae6b5a;
+      border: 1px solid rgba(232, 160, 160, 0.8);
+    }
+
+    .post-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: #b07a60;
+      margin-top: 2px;
+    }
+
+    .copy-btn {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(238, 205, 186, 0.95);
+      background: #fff8f3;
+      color: #8c6b5b;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.12s ease;
+    }
+
+    .copy-btn:hover {
+      background: #ffefe5;
+      border-color: rgba(232, 160, 160, 0.9);
+    }
+
+    .empty-state {
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, #fffdf9, #fff6f3);
+      padding: 22px 18px 18px;
+      text-align: left;
+      color: #8c6b5b;
+      font-size: 12px;
+      border: 1px dashed rgba(238, 205, 186, 0.95);
+    }
+
+    .empty-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #5c3d2e;
+    }
+
+    .empty-list {
+      padding-left: 18px;
+      margin: 6px 0 8px;
+      line-height: 1.6;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #fff8f3;
+      border: 1px dashed rgba(238, 205, 186, 0.95);
+      color: #b07a60;
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #e8a0a0;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%);
+      background: #fff8f3;
+      color: #5c3d2e;
+      font-size: 12px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      box-shadow: 0 18px 40px rgba(221, 178, 153, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.16s ease, transform 0.16s ease;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(232, 160, 160, 0.9);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -4px);
+      pointer-events: auto;
+    }
+
+    .toast-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #ffe4e6, #e8a0a0);
+      box-shadow: 0 0 10px rgba(232, 160, 160, 0.9);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #e5e7eb;
+      border-radius: 999px;
+    }
+
+    .count-select {
+      border-radius: 999px;
+      border: 1px solid rgba(238, 205, 186, 0.95);
+      background: #fff8f3;
+      font-size: 11px;
+      padding: 4px 9px;
+      color: #8c6b5b;
+      outline: none;
+    }
+
+    .count-select:focus {
+      border-color: rgba(232, 160, 160, 0.9);
+      box-shadow: 0 0 0 1px rgba(232, 160, 160, 0.4);
+      background: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-title-block">
+        <div class="app-title-row">
+          <div class="logo-dot"></div>
+          <div class="title-main">鱼仔的创作灵感库</div>
+        </div>
+        <div class="title-sub">
+          小红书心理学内容生成器 · 为创作者准备的高质量选题与文案灵感工具
+        </div>
+        <div class="app-badge-row">
+          <div class="badge-pill">
+            <div class="badge-pill-dot"></div>
+            <span>Story · Empathy · Practice</span>
+          </div>
+        </div>
+      </div>
+      <div class="app-actions">
+        <div class="app-actions-note">
+          单页应用 · 直接部署到 Vercel 即可分享链接
+        </div>
+      </div>
+    </header>
+
+    <main class="app-layout">
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="panel-header">
+            <div class="title">
+              写作输入
+              <span class="title-pill">心理学向小红书笔记</span>
+            </div>
+          </div>
+          <p class="subtitle">
+            输入一个你想深挖的心理学关键词，我会帮你拆成多条
+            <strong>高共鸣 + 有故事 + 有实用建议</strong> 的笔记草稿。
+          </p>
+
+          <div class="form-group">
+            <label for="keyword">
+              关键词（必填）
+            </label>
+            <div class="keyword-input">
+              <input
+                id="keyword"
+                type="text"
+                spellcheck="false"
+                placeholder="例如：原生家庭 / 内耗 / 边界感 / 情绪稳定 / 自我价值感"
+              />
+              <button id="generateBtn">
+                <span>生成文案</span>
+              </button>
+            </div>
+            <div class="hint">
+              <span>也可以直接点下面这些：</span>
+              <div class="chip-row" id="keywordChips">
+                <span class="chip primary">原生家庭</span>
+                <span class="chip">内耗</span>
+                <span class="chip">边界感</span>
+                <span class="chip">情绪稳定</span>
+                <span class="chip">亲密关系</span>
+                <span class="chip">自我价值感</span>
+              </div>
+            </div>
+            <div class="meta-row">
+              <div class="badge-soft">
+                默认生成 <strong id="countLabel">5</strong> 条内容
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:11px;color:#6b7280;">每次生成</span>
+                <select id="countSelect" class="count-select">
+                  <option value="3">3 条</option>
+                  <option value="5" selected>5 条</option>
+                  <option value="8">8 条</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>风格偏好（可选）</label>
+            <div class="chip-row" id="styleChips">
+              <span class="chip primary" data-style="mix">故事 + 共鸣 + 干货（推荐）</span>
+              <span class="chip" data-style="story">故事感强</span>
+              <span class="chip" data-style="practical">工具&干货</span>
+              <span class="chip" data-style="emotional">共鸣&情绪价值</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>适用场景提示（可选，不影响生成，只给你用）</label>
+            <div class="chip-row">
+              <span class="chip">想做系列内容</span>
+              <span class="chip">想做爆款封面标题</span>
+              <span class="chip">想做直播话题引流</span>
+              <span class="chip">想做知识科普</span>
+            </div>
+          </div>
+
+          <p class="hint" style="margin-top:10px;">
+            小提示：如果觉得不够满意，可以多点几次「生成文案」，会随机给你不同角度的内容灵感。
+          </p>
+        </div>
+      </section>
+
+      <section class="panel results-panel">
+        <div class="panel-inner">
+          <div class="results-header-row">
+            <div>
+              <div class="title" style="font-size:15px;margin-bottom:2px;">
+                生成结果
+              </div>
+              <div class="results-meta" id="resultsMeta">
+                等你输入关键词 ✍️
+              </div>
+            </div>
+            <div class="actions-row">
+              <button class="ghost-btn" id="copyAllBtn">
+                复制全部
+              </button>
+            </div>
+          </div>
+          <div class="posts-list" id="postsList">
+            <div class="empty-state">
+              <div class="empty-title">
+                想好你要讲的那个心理学关键词了吗？
+              </div>
+              <p>
+                在左侧输入一个你想做的小红书主题，比如「原生家庭」「情绪稳定」「自我价值感」，
+                然后点一下<strong>生成文案</strong>，这边会立刻帮你准备好多条可直接发布的内容草稿。
+              </p>
+              <ul class="empty-list">
+                <li>每条都会帮你写好：标题 + 正文结构 + 话题标签</li>
+                <li>风格遵循小红书爆款特点：开头有对话感，中间有故事，有实用建议，结尾有共鸣和行动号召</li>
+                <li>不满意就多生成几次，挑你最有感觉的那几条微调后发出去就行</li>
+              </ul>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <span class="pill">
+                  <span class="pill-dot"></span>
+                  高共鸣
+                </span>
+                <span class="pill">
+                  <span class="pill-dot" style="background:#38bdf8;"></span>
+                  有故事
+                </span>
+                <span class="pill">
+                  <span class="pill-dot" style="background:#22c55e;"></span>
+                  有干货
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">
+    <span class="toast-dot"></span>
+    <span id="toastText">已复制到剪贴板</span>
+  </div>
+
+  <script>
+    const keywordInput = document.getElementById('keyword');
+    const generateBtn = document.getElementById('generateBtn');
+    const postsList = document.getElementById('postsList');
+    const resultsMeta = document.getElementById('resultsMeta');
+    const keywordChips = document.getElementById('keywordChips');
+    const styleChips = document.getElementById('styleChips');
+    const countSelect = document.getElementById('countSelect');
+    const countLabel = document.getElementById('countLabel');
+    const copyAllBtn = document.getElementById('copyAllBtn');
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toastText');
+
+    function showToast(text) {
+      toastText.textContent = text;
+      toast.classList.add('show');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    function randomPick(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function getSelectedStyle() {
+      const active = styleChips.querySelector('.chip.primary');
+      return active ? active.dataset.style || 'mix' : 'mix';
+    }
+
+    function buildTitle(keyword, style) {
+      const templates = {
+        mix: [
+          `看懂「${keyword}」，你会突然理解很多事`,
+          `为什么总是被「${keyword}」困住？可能不是你的问题`,
+          `当我开始正视自己的「${keyword}」，人生真的不一样了`,
+          `成年后所有的卡点，几乎都和「${keyword}」有关`,
+          `搞懂「${keyword}」，你就不会那么辛苦了`
+        ],
+        story: [
+          `一个关于「${keyword}」的真实故事：她终于学会为自己活`,
+          `从崩溃到和解，她走出了「${keyword}」的牢笼`,
+          `如果不是那次崩溃，她可能一辈子都没意识到自己的「${keyword}」问题`,
+          `原来一直困住她的，不是能力，而是对「${keyword}」的误解`,
+          `当她说出「我不要再被『${keyword}』绑架了」那一刻，我哭了`
+        ],
+        practical: [
+          `如何温柔地修复自己的「${keyword}」？这5个练习值得每天做`,
+          `学会这3个步骤，你会发现「${keyword}」可以被一点点修回来`,
+          `关于「${keyword}」，这是我心理咨询师朋友最常给的建议`,
+          `用心理学的方法，给自己的「${keyword}」做一次系统体检`,
+          `想跳出「${keyword}」的坑？先从这4个小动作开始`
+        ],
+        emotional: [
+          `那些没被好好看见的「${keyword}」，后来都变成了成年后的心事`,
+          `你看起来很懂事，其实是「${keyword}」积累太久了`,
+          `总是心软、总是委屈，其实都是「${keyword}」在说话`,
+          `为什么你那么努力，还是总觉得不被爱？答案藏在你的「${keyword}」里`,
+          `很多人以为自己是性格问题，其实是「${keyword}」太受伤了`
+        ]
+      };
+      const pool = templates[style] || templates.mix;
+      return randomPick(pool);
+    }
+
+    function buildBody(keyword, style) {
+      const openers = [
+        `你有没有发现，\n明明已经长大了，可是遇到某些场景时，还是会下意识地「像小时候一样」反应？`,
+        `很多人跟我说：「我知道问题出在『${keyword}』，可是我就是改不动。」\n其实你不是不行，只是没人教你可以怎么做。`,
+        `如果你也在被「${keyword}」反复拉扯，请先允许自己停下来，认真看看这些感受背后到底发生了什么。`,
+        `我们这一代人，很少在学校里学过怎么好好面对「${keyword}」。\n但走进社会才发现，它几乎影响着我们所有的选择。`,
+        `你以为自己是在处理当下的事情，但情绪的源头，很多都和「${keyword}」缠在一起。`
+      ];
+
+      const storyBlocks = [
+        `\n\n🔍 我在咨询中遇到过一个来访者。\n她特别怕拒绝人，哪怕已经很累了，还是会习惯性地说「没事，我可以」。\n\n后来我们一点点往回梳理，才发现：\n她从小在一个「情绪不稳定」的环境里长大，为了不被责怪，她学会了：先满足别人，才是「安全」的。`,
+        `\n\n有一次她跟我说：\n「老师，我知道这样不好，可是每次我要开口说‘不’的时候，心里就涌上一股强烈的愧疚感。」\n\n那一刻我特别心疼她。\n因为她不是不会表达边界，而是她从来没被允许拥有自己的感受。`,
+        `\n\n当我们把这些模式放到「${keyword}」这个框架里看时，就会发现：\n她现在的很多选择，并不是「喜欢」或「不喜欢」，而是「害怕再次受伤」。`
+      ];
+
+      const practicalBlocks = [
+        `\n\n📝 如果你也在经历类似的困扰，可以先从这3个小步骤开始：\n\n1）把触发你情绪的场景记录下来\n不需要写得很完美，只要简单写下「时间—事件—当下的感受和想法」。\n\n2）问自己一个问题：这个反应，是现在的我，还是过去的我？\n很多时候，你会惊讶地发现：你是在用小时候的方式保护自己。\n\n3）尝试给自己一个新的回应脚本\n比如把「算了，没关系」换成「我有点在意这件事，我想认真说一下我的想法」。`,
+        `\n\n📌 关于「${keyword}」，可以试着做一个小练习：\n\n- 写下3个你印象深刻的场景：什么时候你最容易被触发？\n- 在每个场景后面，加上一句：当时我最需要的其实是什么？\n- 然后问问现在的自己：我有没有可能，先学会给自己这一部分？\n\n很多时候，我们不是不知道怎么做，而是习惯了忽略自己的需求。`,
+        `\n\n🛠 你可以试着用「三句自我对话」来慢慢修复：\n\n第1句：我看见了——如实说出此刻的感受\n第2句：我理解——承认这份感受背后的合理性\n第3句：我选择——告诉自己接下来想要做的事\n\n当你开始这样对自己说话时，「${keyword}」也会一点点变得不一样。`
+      ];
+
+      const emotionalBlocks = [
+        `\n\n很多人会因为这些模式，开始讨厌现在的自己。\n但其实，那些「看起来很拧巴的反应」，都是你在那个年纪，能想到的最好的保护方式。\n\n你可以不用急着改变自己，先学会对那时候的自己说一句：\n「谢谢你，那时候那么小，却一个人撑过来了。」`,
+        `\n\n心理学里有句话我很喜欢：\n「人生真正的成长，是从不再责怪自己开始的。」\n\n当你愿意温柔地看见自己的「${keyword}」，你就已经在走出旧模式了。`,
+        `\n\n你不需要完全「解决」所有的「${keyword}」才配拥有幸福。\n你只需要在每一次想要重蹈覆辙的时候，哪怕多停半秒，问问自己：\n「这一次，我有没有可能，为自己做一个不一样的选择？」`
+      ];
+
+      const closingBlocks = [
+        `\n\n如果你也正在经历类似的阶段，可以在评论区留一句「我懂」，\n让彼此知道：你不是一个人在和「${keyword}」对抗。`,
+        `\n\n如果你看到这里，说明你已经在认真面对自己的「${keyword}」了。\n这本身，就是一件很值得被看见和被鼓励的事情。`,
+        `\n\n也许改变不会一下子发生，但只要你开始意识到：\n「原来我可以不再被『${keyword}』牵着走」，\n那条新的路，其实已经悄悄出现了。`
+      ];
+
+      let parts = [];
+
+      parts.push(randomPick(openers).replace(/「${keyword}」/g, `「${keyword}」`));
+
+      if (style === 'story' || style === 'mix') {
+        parts.push(randomPick(storyBlocks));
+      }
+
+      if (style === 'practical' || style === 'mix') {
+        parts.push(randomPick(practicalBlocks));
+      }
+
+      if (style === 'emotional' || style === 'mix') {
+        parts.push(randomPick(emotionalBlocks));
+      }
+
+      parts.push(randomPick(closingBlocks));
+
+      return parts.join('');
+    }
+
+    function buildTags(keyword) {
+      const baseTags = [
+        `#${keyword}`,
+        '#心理学',
+        '#情绪疗愈',
+        '#成年人的崩溃',
+        '#自我成长'
+      ];
+
+      const extraPools = [
+        ['#亲密关系', '#爱自己', '#向内探索'],
+        ['#原生家庭议题', '#咨询师视角', '#成长型思维'],
+        ['#情绪稳定练习', '#不讨好的人生', '#高敏感人格'],
+        ['#内耗型人格', '#自我价值感', '#疗愈之路'],
+        ['#边界感', '#学会说不', '#不再委屈自己']
+      ];
+
+      const extras = randomPick(extraPools);
+      return [...new Set([...baseTags, ...extras])].slice(0, 6);
+    }
+
+    function generatePosts() {
+      const rawKeyword = keywordInput.value.trim();
+      if (!rawKeyword) {
+        keywordInput.focus();
+        showToast('先输入一个心理学关键词哦');
+        return;
+      }
+
+      const keyword = rawKeyword.replace(/[#\s]/g, '');
+      const count = parseInt(countSelect.value, 10) || 5;
+      const style = getSelectedStyle();
+
+      generateBtn.disabled = true;
+      generateBtn.textContent = '生成中...';
+
+      setTimeout(() => {
+        const posts = [];
+        for (let i = 0; i < count; i++) {
+          const localStyle = style === 'mix'
+            ? randomPick(['mix', 'story', 'practical', 'emotional'])
+            : style;
+
+          const title = buildTitle(keyword, localStyle);
+          const body = buildBody(keyword, localStyle);
+          const tags = buildTags(keyword);
+
+          posts.push({ title, body, tags, style: localStyle });
+        }
+
+        renderPosts(posts, keyword);
+        generateBtn.disabled = false;
+        generateBtn.textContent = '生成文案';
+      }, 260);
+    }
+
+    function renderPosts(posts, keyword) {
+      postsList.innerHTML = '';
+
+      posts.forEach((post, index) => {
+        const card = document.createElement('article');
+        card.className = 'post-card';
+
+        const indexBadge = document.createElement('div');
+        indexBadge.className = 'post-index';
+        indexBadge.textContent = `NO.${index + 1}`;
+        card.appendChild(indexBadge);
+
+        const titleEl = document.createElement('h3');
+        titleEl.className = 'post-title';
+        titleEl.textContent = post.title;
+        card.appendChild(titleEl);
+
+        const bodyEl = document.createElement('div');
+        bodyEl.className = 'post-body';
+        bodyEl.textContent = post.body;
+        card.appendChild(bodyEl);
+
+        const tagsWrap = document.createElement('div');
+        tagsWrap.className = 'post-tags';
+        post.tags.forEach(t => {
+          const tagEl = document.createElement('span');
+          tagEl.className = 'tag';
+          tagEl.textContent = t;
+          tagsWrap.appendChild(tagEl);
+        });
+        card.appendChild(tagsWrap);
+
+        const footer = document.createElement('div');
+        footer.className = 'post-footer';
+
+        const meta = document.createElement('span');
+        meta.textContent = {
+          story: '故事向 · 共鸣感强',
+          practical: '工具向 · 干货为主',
+          emotional: '情绪向 · 共情疗愈',
+          mix: '综合向 · 多维度展开'
+        }[post.style] || '综合向 · 多维度展开';
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.textContent = '复制这条';
+        copyBtn.addEventListener('click', () => {
+          const full = `【标题】\n${post.title}\n\n【正文】\n${post.body}\n\n【话题标签】\n${post.tags.join(' ')}`;
+          navigator.clipboard.writeText(full).then(() => {
+            showToast('当前文案已复制，可以直接粘贴到小红书～');
+          });
+        });
+
+        footer.appendChild(meta);
+        footer.appendChild(copyBtn);
+        card.appendChild(footer);
+
+        postsList.appendChild(card);
+      });
+
+      resultsMeta.innerHTML = `已根据 <strong>「${keyword}」</strong> 生成 <strong>${posts.length}</strong> 条可直接使用的小红书文案，可按需二次修改。`;
+    }
+
+    if (keywordChips) {
+      keywordChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        keywordInput.value = chip.textContent.trim();
+        keywordInput.focus();
+      });
+    }
+
+    if (styleChips) {
+      styleChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        styleChips.querySelectorAll('.chip').forEach(c => c.classList.remove('primary'));
+        chip.classList.add('primary');
+      });
+    }
+
+    generateBtn.addEventListener('click', generatePosts);
+
+    keywordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        generatePosts();
+      }
+    });
+
+    countSelect.addEventListener('change', () => {
+      countLabel.textContent = countSelect.value;
+    });
+
+    copyAllBtn.addEventListener('click', () => {
+      const cards = postsList.querySelectorAll('.post-card');
+      if (!cards.length) {
+        showToast('还没有内容可复制，先生成一批文案吧');
+        return;
+      }
+
+      const blocks = [];
+      cards.forEach((card, index) => {
+        const title = card.querySelector('.post-title')?.textContent || '';
+        const body = card.querySelector('.post-body')?.textContent || '';
+        const tags = Array.from(card.querySelectorAll('.tag')).map(t => t.textContent).join(' ');
+
+        blocks.push(
+          `第${index + 1}条\n\n【标题】\n${title}\n\n【正文】\n${body}\n\n【话题标签】\n${tags}`
+        );
+      });
+
+      const text = blocks.join('\n\n------------------------\n\n');
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('本页所有文案已复制，去小红书排版就行啦');
+      });
+    });
+  </script>
+</body>
+</html>
+
