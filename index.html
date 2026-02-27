@@ -58,6 +58,34 @@
       gap: 14px;
     }
 
+    .nav-tabs {
+      margin-top: 16px;
+      display: inline-flex;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255, 248, 243, 0.9);
+      border: 1px solid rgba(241, 210, 190, 0.9);
+      gap: 4px;
+    }
+
+    .nav-tab {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 12px;
+      font-size: 12px;
+      background: transparent;
+      color: #8c6b5b;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .nav-tab.active {
+      background: linear-gradient(135deg, #ffe1dd, #f7c6c7);
+      color: #5c3d2e;
+      box-shadow: 0 6px 16px rgba(221, 178, 153, 0.6);
+    }
+
     .app-title-block {
       display: flex;
       flex-direction: column;
@@ -620,6 +648,7 @@
       box-shadow: 0 0 0 1px rgba(232, 160, 160, 0.4);
       background: #ffffff;
     }
+
   </style>
 </head>
 <body>
@@ -631,7 +660,7 @@
           <div class="title-main">鱼仔的创作灵感库</div>
         </div>
         <div class="title-sub">
-          小红书心理学内容生成器 · 为创作者准备的高质量选题与文案灵感工具
+          小红书账号「鱼仔的心理树洞」专属 · 身心疗愈 / 情感关系 / 女性成长创作中台
         </div>
         <div class="app-badge-row">
           <div class="badge-pill">
@@ -639,140 +668,268 @@
             <span>Story · Empathy · Practice</span>
           </div>
         </div>
+        <div class="nav-tabs" id="navTabs">
+          <button class="nav-tab active" data-agent="content">内容生产</button>
+          <button class="nav-tab" data-agent="radar">爆款雷达</button>
+          <button class="nav-tab" data-agent="titles">标题测试</button>
+        </div>
       </div>
       <div class="app-actions">
         <div class="app-actions-note">
-          单页应用 · 直接部署到 Vercel 即可分享链接
+          API Key 由 Vercel 环境变量配置，安全不泄露
         </div>
       </div>
     </header>
 
-    <main class="app-layout">
-      <section class="panel">
+    <main class="app-layout" id="agentContent">
+      <!-- Agent 1：内容生产 -->
+      <section class="panel agent-panel" data-agent="content">
         <div class="panel-inner">
           <div class="panel-header">
             <div class="title">
-              写作输入
-              <span class="title-pill">心理学向小红书笔记</span>
+              Agent 1 · 内容生产
+              <span class="title-pill">小红书心理学笔记生成</span>
             </div>
           </div>
           <p class="subtitle">
-            输入一个你想深挖的心理学关键词，我会帮你拆成多条
-            <strong>高共鸣 + 有故事 + 有实用建议</strong> 的笔记草稿。
+            输入一个你想深挖的心理学关键词，我会结合「鱼仔的心理树洞」账号定位，
+            生成多条适合直接发布的小红书笔记草稿。
           </p>
 
           <div class="form-group">
-            <label for="keyword">
+            <label for="content-keyword">
               关键词（必填）
             </label>
             <div class="keyword-input">
               <input
-                id="keyword"
+                id="content-keyword"
                 type="text"
                 spellcheck="false"
                 placeholder="例如：原生家庭 / 内耗 / 边界感 / 情绪稳定 / 自我价值感"
               />
-              <button id="generateBtn">
-                <span>生成文案</span>
-              </button>
             </div>
-            <div class="hint">
-              <span>也可以直接点下面这些：</span>
-              <div class="chip-row" id="keywordChips">
-                <span class="chip primary">原生家庭</span>
-                <span class="chip">内耗</span>
-                <span class="chip">边界感</span>
-                <span class="chip">情绪稳定</span>
-                <span class="chip">亲密关系</span>
-                <span class="chip">自我价值感</span>
-              </div>
+          </div>
+
+          <div class="form-group">
+            <label>风格偏好</label>
+            <div class="chip-row" id="content-style-chips">
+              <span class="chip primary" data-style="healing_story">疗愈故事</span>
+              <span class="chip" data-style="practical">干货实用</span>
+              <span class="chip" data-style="emotional">情感共鸣</span>
             </div>
+          </div>
+
+          <div class="form-group">
+            <label>生成条数</label>
             <div class="meta-row">
               <div class="badge-soft">
-                默认生成 <strong id="countLabel">5</strong> 条内容
+                每次生成 <strong id="content-count-label">3</strong> 条
               </div>
               <div style="display:flex;align-items:center;gap:6px;">
-                <span style="font-size:11px;color:#6b7280;">每次生成</span>
-                <select id="countSelect" class="count-select">
-                  <option value="3">3 条</option>
-                  <option value="5" selected>5 条</option>
-                  <option value="8">8 条</option>
+                <select id="content-count" class="count-select">
+                  <option value="1">1 条（精修）</option>
+                  <option value="3" selected>3 条</option>
+                  <option value="5">5 条</option>
                 </select>
               </div>
             </div>
           </div>
 
           <div class="form-group">
-            <label>风格偏好（可选）</label>
-            <div class="chip-row" id="styleChips">
-              <span class="chip primary" data-style="mix">故事 + 共鸣 + 干货（推荐）</span>
-              <span class="chip" data-style="story">故事感强</span>
-              <span class="chip" data-style="practical">工具&干货</span>
-              <span class="chip" data-style="emotional">共鸣&情绪价值</span>
+            <label>猜你现在的创作状态（可选）</label>
+            <div class="chip-row" id="content-keyword-chips">
+              <span class="chip">灵感很多但不知道从哪条开始写</span>
+              <span class="chip">最近有点丧，想写点疗愈向</span>
+              <span class="chip">想做一组系列内容</span>
+              <span class="chip">手上有咨询案例想改写成故事</span>
             </div>
           </div>
 
-          <div class="form-group">
-            <label>适用场景提示（可选，不影响生成，只给你用）</label>
-            <div class="chip-row">
-              <span class="chip">想做系列内容</span>
-              <span class="chip">想做爆款封面标题</span>
-              <span class="chip">想做直播话题引流</span>
-              <span class="chip">想做知识科普</span>
-            </div>
-          </div>
+          <button id="content-generate-btn" style="margin-top:4px;">
+            生成小红书笔记
+          </button>
 
-          <p class="hint" style="margin-top:10px;">
-            小提示：如果觉得不够满意，可以多点几次「生成文案」，会随机给你不同角度的内容灵感。
+          <p class="hint" style="margin-top:8px;">
+            提示：AI 会先用一小段「思考过程」帮你梳理切入角度，再写正式笔记内容。
           </p>
         </div>
       </section>
 
-      <section class="panel results-panel">
+      <section class="panel results-panel agent-panel" data-agent="content">
         <div class="panel-inner">
           <div class="results-header-row">
             <div>
               <div class="title" style="font-size:15px;margin-bottom:2px;">
-                生成结果
+                生成结果 · 小红书笔记
               </div>
-              <div class="results-meta" id="resultsMeta">
+              <div class="results-meta" id="content-results-meta">
                 等你输入关键词 ✍️
               </div>
             </div>
             <div class="actions-row">
-              <button class="ghost-btn" id="copyAllBtn">
+              <button class="ghost-btn" id="content-copy-all">
                 复制全部
               </button>
             </div>
           </div>
-          <div class="posts-list" id="postsList">
+          <div class="posts-list" id="content-posts-list">
             <div class="empty-state">
               <div class="empty-title">
-                想好你要讲的那个心理学关键词了吗？
+                先告诉我，你最近最想聊的那个心理学关键词？
               </div>
               <p>
-                在左侧输入一个你想做的小红书主题，比如「原生家庭」「情绪稳定」「自我价值感」，
-                然后点一下<strong>生成文案</strong>，这边会立刻帮你准备好多条可直接发布的内容草稿。
+                比如「原生家庭」「情绪稳定」「亲密关系里的边界感」，我会按照「鱼仔的心理树洞」的账号定位，
+                帮你拆成多条有故事、有共鸣、又有小练习的小红书笔记。
               </p>
               <ul class="empty-list">
-                <li>每条都会帮你写好：标题 + 正文结构 + 话题标签</li>
-                <li>风格遵循小红书爆款特点：开头有对话感，中间有故事，有实用建议，结尾有共鸣和行动号召</li>
-                <li>不满意就多生成几次，挑你最有感觉的那几条微调后发出去就行</li>
+                <li>每条都自带：标题 + 正文结构 + 适配的话题标签</li>
+                <li>正文会有明显的段落节奏，让读者容易读、容易收藏和评论</li>
+                <li>你可以把喜欢的结果收藏起来，之后按系列慢慢发布</li>
               </ul>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <span class="pill">
                   <span class="pill-dot"></span>
-                  高共鸣
-                </span>
-                <span class="pill">
-                  <span class="pill-dot" style="background:#38bdf8;"></span>
                   有故事
                 </span>
                 <span class="pill">
-                  <span class="pill-dot" style="background:#22c55e;"></span>
-                  有干货
+                  <span class="pill-dot" style="background:#f5c9a0;"></span>
+                  有共鸣
+                </span>
+                <span class="pill">
+                  <span class="pill-dot" style="background:#e8a0a0;"></span>
+                  有小练习
                 </span>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Agent 2：爆款雷达 -->
+      <section class="panel agent-panel" data-agent="radar" style="display:none;">
+        <div class="panel-inner">
+          <div class="panel-header">
+            <div class="title">
+              Agent 2 · 爆款雷达
+              <span class="title-pill">话题热度&用户痛点扫描</span>
+            </div>
+          </div>
+          <p class="subtitle">
+            输入一个情绪相关的关键词，我会从平台趋势、用户情绪与内容消费习惯出发，
+            帮你拆解这个话题适合的爆款切入角度。
+          </p>
+
+          <div class="form-group">
+            <label for="radar-keyword">情绪关键词（必填）</label>
+            <div class="keyword-input">
+              <input
+                id="radar-keyword"
+                type="text"
+                spellcheck="false"
+                placeholder="例如：崩溃 / 空心 / 情绪稳定 / 自我怀疑"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>你更关心哪一类读者？（可选）</label>
+            <div class="chip-row" id="radar-target-chips">
+              <span class="chip">职场高压女孩</span>
+              <span class="chip">情感关系里很拧巴的人</span>
+              <span class="chip">长期焦虑、睡不好的人</span>
+              <span class="chip">外表独立但内心很敏感的人</span>
+            </div>
+          </div>
+
+          <button id="radar-generate-btn">
+            扫描爆款切入角度
+          </button>
+        </div>
+      </section>
+
+      <section class="panel results-panel agent-panel" data-agent="radar" style="display:none;">
+        <div class="panel-inner">
+          <div class="results-header-row">
+            <div>
+              <div class="title" style="font-size:15px;margin-bottom:2px;">
+                分析结果 · 选题方向
+              </div>
+              <div class="results-meta" id="radar-results-meta">
+                等你输入情绪关键词 ✍️
+              </div>
+            </div>
+          </div>
+          <div class="posts-list" id="radar-list">
+            <div class="empty-state">
+              <div class="empty-title">
+                不确定这个话题还能怎么写了吗？
+              </div>
+              <p>
+                把你最近反复想到的那个情绪词丢进来，比如「崩溃」「内耗」「失控」，我会帮你看到：
+                现在平台上更容易爆的切入角度、用户到底在纠结什么、你可以从哪里讲起。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Agent 3：标题测试 -->
+      <section class="panel agent-panel" data-agent="titles" style="display:none;">
+        <div class="panel-inner">
+          <div class="panel-header">
+            <div class="title">
+              Agent 3 · 标题测试
+              <span class="title-pill">多风格标题脑洞机</span>
+            </div>
+          </div>
+          <p class="subtitle">
+            输入一个你想写的主题，我会给出多种风格的标题方案（悬念型 / 共鸣型 / 干货型 / 反差型等），
+            并解释为什么这个标题有机会爆。
+          </p>
+
+          <div class="form-group">
+            <label for="titles-topic">主题（必填）</label>
+            <div class="keyword-input">
+              <input
+                id="titles-topic"
+                type="text"
+                spellcheck="false"
+                placeholder="例如：总是在关系里过度付出 / 情绪稳定训练营 / 和原生家庭和解"
+              />
+            </div>
+          </div>
+
+          <button id="titles-generate-btn">
+            生成 8 个标题方案
+          </button>
+
+          <p class="hint" style="margin-top:8px;">
+            提示：你可以把喜欢的标题改一改再用，或者组合不同标题里的关键词。
+          </p>
+        </div>
+      </section>
+
+      <section class="panel results-panel agent-panel" data-agent="titles" style="display:none;">
+        <div class="panel-inner">
+          <div class="results-header-row">
+            <div>
+              <div class="title" style="font-size:15px;margin-bottom:2px;">
+                测试结果 · 标题候选
+              </div>
+              <div class="results-meta" id="titles-results-meta">
+                先告诉我你想写的主题 ✍️
+              </div>
+            </div>
+          </div>
+          <div class="posts-list" id="titles-list">
+            <div class="empty-state">
+              <div class="empty-title">
+                标题起不出来，只能干瞪眼？
+              </div>
+              <p>
+                直接输入你想写的大致方向，比如「长期情绪不稳定的女孩」「总是在关系里委屈自己的人」，我会给你一整排可用标题，
+                并告诉你「为什么这个标题可能会爆」。
+              </p>
             </div>
           </div>
         </div>
@@ -786,15 +943,6 @@
   </div>
 
   <script>
-    const keywordInput = document.getElementById('keyword');
-    const generateBtn = document.getElementById('generateBtn');
-    const postsList = document.getElementById('postsList');
-    const resultsMeta = document.getElementById('resultsMeta');
-    const keywordChips = document.getElementById('keywordChips');
-    const styleChips = document.getElementById('styleChips');
-    const countSelect = document.getElementById('countSelect');
-    const countLabel = document.getElementById('countLabel');
-    const copyAllBtn = document.getElementById('copyAllBtn');
     const toast = document.getElementById('toast');
     const toastText = document.getElementById('toastText');
 
@@ -804,165 +952,118 @@
       clearTimeout(showToast._timer);
       showToast._timer = setTimeout(() => {
         toast.classList.remove('show');
-      }, 2000);
+      }, 2200);
     }
 
-    function randomPick(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    }
+    async function callAgent(agent, payload) {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ agent, payload })
+      });
 
-    function getSelectedStyle() {
-      const active = styleChips.querySelector('.chip.primary');
-      return active ? active.dataset.style || 'mix' : 'mix';
-    }
-
-    function buildTitle(keyword, style) {
-      const templates = {
-        mix: [
-          `看懂「${keyword}」，你会突然理解很多事`,
-          `为什么总是被「${keyword}」困住？可能不是你的问题`,
-          `当我开始正视自己的「${keyword}」，人生真的不一样了`,
-          `成年后所有的卡点，几乎都和「${keyword}」有关`,
-          `搞懂「${keyword}」，你就不会那么辛苦了`
-        ],
-        story: [
-          `一个关于「${keyword}」的真实故事：她终于学会为自己活`,
-          `从崩溃到和解，她走出了「${keyword}」的牢笼`,
-          `如果不是那次崩溃，她可能一辈子都没意识到自己的「${keyword}」问题`,
-          `原来一直困住她的，不是能力，而是对「${keyword}」的误解`,
-          `当她说出「我不要再被『${keyword}』绑架了」那一刻，我哭了`
-        ],
-        practical: [
-          `如何温柔地修复自己的「${keyword}」？这5个练习值得每天做`,
-          `学会这3个步骤，你会发现「${keyword}」可以被一点点修回来`,
-          `关于「${keyword}」，这是我心理咨询师朋友最常给的建议`,
-          `用心理学的方法，给自己的「${keyword}」做一次系统体检`,
-          `想跳出「${keyword}」的坑？先从这4个小动作开始`
-        ],
-        emotional: [
-          `那些没被好好看见的「${keyword}」，后来都变成了成年后的心事`,
-          `你看起来很懂事，其实是「${keyword}」积累太久了`,
-          `总是心软、总是委屈，其实都是「${keyword}」在说话`,
-          `为什么你那么努力，还是总觉得不被爱？答案藏在你的「${keyword}」里`,
-          `很多人以为自己是性格问题，其实是「${keyword}」太受伤了`
-        ]
-      };
-      const pool = templates[style] || templates.mix;
-      return randomPick(pool);
-    }
-
-    function buildBody(keyword, style) {
-      const openers = [
-        `你有没有发现，\n明明已经长大了，可是遇到某些场景时，还是会下意识地「像小时候一样」反应？`,
-        `很多人跟我说：「我知道问题出在『${keyword}』，可是我就是改不动。」\n其实你不是不行，只是没人教你可以怎么做。`,
-        `如果你也在被「${keyword}」反复拉扯，请先允许自己停下来，认真看看这些感受背后到底发生了什么。`,
-        `我们这一代人，很少在学校里学过怎么好好面对「${keyword}」。\n但走进社会才发现，它几乎影响着我们所有的选择。`,
-        `你以为自己是在处理当下的事情，但情绪的源头，很多都和「${keyword}」缠在一起。`
-      ];
-
-      const storyBlocks = [
-        `\n\n🔍 我在咨询中遇到过一个来访者。\n她特别怕拒绝人，哪怕已经很累了，还是会习惯性地说「没事，我可以」。\n\n后来我们一点点往回梳理，才发现：\n她从小在一个「情绪不稳定」的环境里长大，为了不被责怪，她学会了：先满足别人，才是「安全」的。`,
-        `\n\n有一次她跟我说：\n「老师，我知道这样不好，可是每次我要开口说‘不’的时候，心里就涌上一股强烈的愧疚感。」\n\n那一刻我特别心疼她。\n因为她不是不会表达边界，而是她从来没被允许拥有自己的感受。`,
-        `\n\n当我们把这些模式放到「${keyword}」这个框架里看时，就会发现：\n她现在的很多选择，并不是「喜欢」或「不喜欢」，而是「害怕再次受伤」。`
-      ];
-
-      const practicalBlocks = [
-        `\n\n📝 如果你也在经历类似的困扰，可以先从这3个小步骤开始：\n\n1）把触发你情绪的场景记录下来\n不需要写得很完美，只要简单写下「时间—事件—当下的感受和想法」。\n\n2）问自己一个问题：这个反应，是现在的我，还是过去的我？\n很多时候，你会惊讶地发现：你是在用小时候的方式保护自己。\n\n3）尝试给自己一个新的回应脚本\n比如把「算了，没关系」换成「我有点在意这件事，我想认真说一下我的想法」。`,
-        `\n\n📌 关于「${keyword}」，可以试着做一个小练习：\n\n- 写下3个你印象深刻的场景：什么时候你最容易被触发？\n- 在每个场景后面，加上一句：当时我最需要的其实是什么？\n- 然后问问现在的自己：我有没有可能，先学会给自己这一部分？\n\n很多时候，我们不是不知道怎么做，而是习惯了忽略自己的需求。`,
-        `\n\n🛠 你可以试着用「三句自我对话」来慢慢修复：\n\n第1句：我看见了——如实说出此刻的感受\n第2句：我理解——承认这份感受背后的合理性\n第3句：我选择——告诉自己接下来想要做的事\n\n当你开始这样对自己说话时，「${keyword}」也会一点点变得不一样。`
-      ];
-
-      const emotionalBlocks = [
-        `\n\n很多人会因为这些模式，开始讨厌现在的自己。\n但其实，那些「看起来很拧巴的反应」，都是你在那个年纪，能想到的最好的保护方式。\n\n你可以不用急着改变自己，先学会对那时候的自己说一句：\n「谢谢你，那时候那么小，却一个人撑过来了。」`,
-        `\n\n心理学里有句话我很喜欢：\n「人生真正的成长，是从不再责怪自己开始的。」\n\n当你愿意温柔地看见自己的「${keyword}」，你就已经在走出旧模式了。`,
-        `\n\n你不需要完全「解决」所有的「${keyword}」才配拥有幸福。\n你只需要在每一次想要重蹈覆辙的时候，哪怕多停半秒，问问自己：\n「这一次，我有没有可能，为自己做一个不一样的选择？」`
-      ];
-
-      const closingBlocks = [
-        `\n\n如果你也正在经历类似的阶段，可以在评论区留一句「我懂」，\n让彼此知道：你不是一个人在和「${keyword}」对抗。`,
-        `\n\n如果你看到这里，说明你已经在认真面对自己的「${keyword}」了。\n这本身，就是一件很值得被看见和被鼓励的事情。`,
-        `\n\n也许改变不会一下子发生，但只要你开始意识到：\n「原来我可以不再被『${keyword}』牵着走」，\n那条新的路，其实已经悄悄出现了。`
-      ];
-
-      let parts = [];
-
-      parts.push(randomPick(openers).replace(/「${keyword}」/g, `「${keyword}」`));
-
-      if (style === 'story' || style === 'mix') {
-        parts.push(randomPick(storyBlocks));
+      if (!res.ok) {
+        let message = '请求失败，请稍后再试';
+        try {
+          const data = await res.json();
+          if (data && data.error) message = data.error;
+        } catch (e) {}
+        throw new Error(message);
       }
 
-      if (style === 'practical' || style === 'mix') {
-        parts.push(randomPick(practicalBlocks));
-      }
-
-      if (style === 'emotional' || style === 'mix') {
-        parts.push(randomPick(emotionalBlocks));
-      }
-
-      parts.push(randomPick(closingBlocks));
-
-      return parts.join('');
+      const json = await res.json();
+      return json.data;
     }
 
-    function buildTags(keyword) {
-      const baseTags = [
-        `#${keyword}`,
-        '#心理学',
-        '#情绪疗愈',
-        '#成年人的崩溃',
-        '#自我成长'
-      ];
-
-      const extraPools = [
-        ['#亲密关系', '#爱自己', '#向内探索'],
-        ['#原生家庭议题', '#咨询师视角', '#成长型思维'],
-        ['#情绪稳定练习', '#不讨好的人生', '#高敏感人格'],
-        ['#内耗型人格', '#自我价值感', '#疗愈之路'],
-        ['#边界感', '#学会说不', '#不再委屈自己']
-      ];
-
-      const extras = randomPick(extraPools);
-      return [...new Set([...baseTags, ...extras])].slice(0, 6);
-    }
-
-    function generatePosts() {
-      const rawKeyword = keywordInput.value.trim();
-      if (!rawKeyword) {
-        keywordInput.focus();
-        showToast('先输入一个心理学关键词哦');
-        return;
-      }
-
-      const keyword = rawKeyword.replace(/[#\s]/g, '');
-      const count = parseInt(countSelect.value, 10) || 5;
-      const style = getSelectedStyle();
-
-      generateBtn.disabled = true;
-      generateBtn.textContent = '生成中...';
-
-      setTimeout(() => {
-        const posts = [];
-        for (let i = 0; i < count; i++) {
-          const localStyle = style === 'mix'
-            ? randomPick(['mix', 'story', 'practical', 'emotional'])
-            : style;
-
-          const title = buildTitle(keyword, localStyle);
-          const body = buildBody(keyword, localStyle);
-          const tags = buildTags(keyword);
-
-          posts.push({ title, body, tags, style: localStyle });
+    function typewriterEffect(element, fullText, speed = 18) {
+      element.textContent = '';
+      let idx = 0;
+      return new Promise(resolve => {
+        function step() {
+          if (idx >= fullText.length) {
+            resolve();
+            return;
+          }
+          element.textContent += fullText[idx];
+          idx += 1;
+          const ch = fullText[idx - 1];
+          const delay = ch === '，' || ch === '。' || ch === '？' || ch === '！' || ch === '\n'
+            ? speed * 3
+            : speed;
+          setTimeout(step, delay);
         }
-
-        renderPosts(posts, keyword);
-        generateBtn.disabled = false;
-        generateBtn.textContent = '生成文案';
-      }, 260);
+        step();
+      });
     }
 
-    function renderPosts(posts, keyword) {
-      postsList.innerHTML = '';
+    // 顶部导航切换
+    const navTabs = document.getElementById('navTabs');
+    const agentPanels = document.querySelectorAll('.agent-panel');
+
+    if (navTabs) {
+      navTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.nav-tab');
+        if (!btn) return;
+        const agent = btn.dataset.agent;
+        navTabs.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        agentPanels.forEach(panel => {
+          if (panel.dataset.agent === agent) {
+            panel.style.display = '';
+          } else {
+            panel.style.display = 'none';
+          }
+        });
+      });
+    }
+
+    // Agent 1：内容生产
+    const contentKeywordInput = document.getElementById('content-keyword');
+    const contentStyleChips = document.getElementById('content-style-chips');
+    const contentCountSelect = document.getElementById('content-count');
+    const contentCountLabel = document.getElementById('content-count-label');
+    const contentKeywordChips = document.getElementById('content-keyword-chips');
+    const contentGenerateBtn = document.getElementById('content-generate-btn');
+    const contentResultsMeta = document.getElementById('content-results-meta');
+    const contentPostsList = document.getElementById('content-posts-list');
+    const contentCopyAllBtn = document.getElementById('content-copy-all');
+
+    let contentFavorites = [];
+
+    function getContentStyle() {
+      const active = contentStyleChips?.querySelector('.chip.primary');
+      return active ? active.dataset.style || 'healing_story' : 'healing_story';
+    }
+
+    if (contentStyleChips) {
+      contentStyleChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        contentStyleChips.querySelectorAll('.chip').forEach(c => c.classList.remove('primary'));
+        chip.classList.add('primary');
+      });
+    }
+
+    if (contentCountSelect) {
+      contentCountSelect.addEventListener('change', () => {
+        contentCountLabel.textContent = contentCountSelect.value;
+      });
+    }
+
+    if (contentKeywordChips) {
+      contentKeywordChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        showToast(chip.textContent.trim());
+      });
+    }
+
+    function renderContentPosts(data, keyword) {
+      const posts = data.posts || [];
+      contentPostsList.innerHTML = '';
 
       posts.forEach((post, index) => {
         const card = document.createElement('article');
@@ -975,17 +1076,25 @@
 
         const titleEl = document.createElement('h3');
         titleEl.className = 'post-title';
-        titleEl.textContent = post.title;
+        titleEl.textContent = post.title || '';
         card.appendChild(titleEl);
+
+        const thinkingEl = document.createElement('div');
+        thinkingEl.className = 'post-body';
+        thinkingEl.style.fontSize = '11px';
+        thinkingEl.style.color = '#b07a60';
+        thinkingEl.style.marginBottom = '4px';
+        thinkingEl.textContent = '【思考过程】正在整理切入角度…';
+        card.appendChild(thinkingEl);
 
         const bodyEl = document.createElement('div');
         bodyEl.className = 'post-body';
-        bodyEl.textContent = post.body;
+        bodyEl.textContent = '';
         card.appendChild(bodyEl);
 
         const tagsWrap = document.createElement('div');
         tagsWrap.className = 'post-tags';
-        post.tags.forEach(t => {
+        (post.tags || []).forEach(t => {
           const tagEl = document.createElement('span');
           tagEl.className = 'tag';
           tagEl.textContent = t;
@@ -998,19 +1107,291 @@
 
         const meta = document.createElement('span');
         meta.textContent = {
-          story: '故事向 · 共鸣感强',
-          practical: '工具向 · 干货为主',
-          emotional: '情绪向 · 共情疗愈',
-          mix: '综合向 · 多维度展开'
-        }[post.style] || '综合向 · 多维度展开';
+          healing_story: '疗愈故事向',
+          practical: '干货实用向',
+          emotional: '情感共鸣向'
+        }[post.style] || '综合向';
+
+        const actions = document.createElement('div');
+        actions.style.display = 'flex';
+        actions.style.gap = '6px';
+
+        const favBtn = document.createElement('button');
+        favBtn.className = 'copy-btn';
+        favBtn.textContent = '收藏';
+
+        favBtn.addEventListener('click', () => {
+          const key = post.title + '|' + (post.body || '');
+          const exists = contentFavorites.includes(key);
+          if (exists) {
+            contentFavorites = contentFavorites.filter(k => k !== key);
+            favBtn.textContent = '收藏';
+            showToast('已从收藏中移除');
+          } else {
+            contentFavorites.push(key);
+            favBtn.textContent = '已收藏';
+            showToast('已收藏这条灵感');
+          }
+        });
 
         const copyBtn = document.createElement('button');
         copyBtn.className = 'copy-btn';
-        copyBtn.textContent = '复制这条';
+        copyBtn.textContent = '复制';
         copyBtn.addEventListener('click', () => {
-          const full = `【标题】\n${post.title}\n\n【正文】\n${post.body}\n\n【话题标签】\n${post.tags.join(' ')}`;
+          const tags = (post.tags || []).join(' ');
+          const full = `【标题】\n${post.title || ''}\n\n【正文】\n${post.body || ''}\n\n【话题标签】\n${tags}`;
           navigator.clipboard.writeText(full).then(() => {
             showToast('当前文案已复制，可以直接粘贴到小红书～');
+          });
+        });
+
+        actions.appendChild(favBtn);
+        actions.appendChild(copyBtn);
+
+        footer.appendChild(meta);
+        footer.appendChild(actions);
+        card.appendChild(footer);
+
+        contentPostsList.appendChild(card);
+
+        const thinking = post.thinking || '';
+        const body = post.body || '';
+        typewriterEffect(thinkingEl, `【思考过程】\n${thinking}`).then(() => {
+          return typewriterEffect(bodyEl, body);
+        });
+      });
+
+      contentResultsMeta.innerHTML =
+        `已根据 <strong>「${keyword}」</strong> 生成 <strong>${posts.length}</strong> 条小红书笔记草稿，可按需微调后发布。`;
+    }
+
+    if (contentGenerateBtn) {
+      contentGenerateBtn.addEventListener('click', async () => {
+        const raw = contentKeywordInput.value.trim();
+        if (!raw) {
+          contentKeywordInput.focus();
+          showToast('先输入一个心理学关键词哦');
+          return;
+        }
+
+        const keyword = raw.replace(/[#\s]/g, '');
+        const style = getContentStyle();
+        const count = parseInt(contentCountSelect.value, 10) || 3;
+
+        contentGenerateBtn.disabled = true;
+        contentGenerateBtn.textContent = '生成中…';
+        contentResultsMeta.textContent = 'AI 正在根据账号定位思考结构和切入角度…';
+
+        try {
+          const data = await callAgent('content', { keyword, style, count });
+          renderContentPosts(data, keyword);
+        } catch (err) {
+          console.error(err);
+          showToast(err.message || '生成失败，请稍后再试');
+        } finally {
+          contentGenerateBtn.disabled = false;
+          contentGenerateBtn.textContent = '生成小红书笔记';
+        }
+      });
+
+      contentKeywordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          contentGenerateBtn.click();
+        }
+      });
+    }
+
+    if (contentCopyAllBtn) {
+      contentCopyAllBtn.addEventListener('click', () => {
+        const cards = contentPostsList.querySelectorAll('.post-card');
+        if (!cards.length) {
+          showToast('还没有内容可复制，先生成一批文案吧');
+          return;
+        }
+
+        const blocks = [];
+        cards.forEach((card, index) => {
+          const title = card.querySelector('.post-title')?.textContent || '';
+          const body = Array.from(card.querySelectorAll('.post-body'))[1]?.textContent || '';
+          const tags = Array.from(card.querySelectorAll('.tag')).map(t => t.textContent).join(' ');
+
+          blocks.push(
+            `第${index + 1}条\n\n【标题】\n${title}\n\n【正文】\n${body}\n\n【话题标签】\n${tags}`
+          );
+        });
+
+        const text = blocks.join('\n\n------------------------\n\n');
+
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('本页所有文案已复制，去小红书排版就行啦');
+        });
+      });
+    }
+
+    // Agent 2：爆款雷达
+    const radarKeywordInput = document.getElementById('radar-keyword');
+    const radarTargetChips = document.getElementById('radar-target-chips');
+    const radarGenerateBtn = document.getElementById('radar-generate-btn');
+    const radarResultsMeta = document.getElementById('radar-results-meta');
+    const radarList = document.getElementById('radar-list');
+
+    if (radarTargetChips) {
+      radarTargetChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        radarTargetChips.querySelectorAll('.chip').forEach(c => c.classList.remove('primary'));
+        chip.classList.add('primary');
+      });
+    }
+
+    function renderRadarResults(data, keyword) {
+      radarList.innerHTML = '';
+      const ideas = data.ideas || [];
+
+      ideas.forEach((idea, index) => {
+        const card = document.createElement('article');
+        card.className = 'post-card';
+
+        const indexBadge = document.createElement('div');
+        indexBadge.className = 'post-index';
+        indexBadge.textContent = `方向 ${index + 1}`;
+        card.appendChild(indexBadge);
+
+        const titleEl = document.createElement('h3');
+        titleEl.className = 'post-title';
+        titleEl.textContent = idea.angleTitle || '';
+        card.appendChild(titleEl);
+
+        const bodyEl = document.createElement('div');
+        bodyEl.className = 'post-body';
+        bodyEl.textContent = idea.summary || '';
+        card.appendChild(bodyEl);
+
+        const tagsWrap = document.createElement('div');
+        tagsWrap.className = 'post-tags';
+        (idea.painPoints || []).forEach(t => {
+          const tagEl = document.createElement('span');
+          tagEl.className = 'tag';
+          tagEl.textContent = t;
+          tagsWrap.appendChild(tagEl);
+        });
+        card.appendChild(tagsWrap);
+
+        const footer = document.createElement('div');
+        footer.className = 'post-footer';
+
+        const meta = document.createElement('span');
+        meta.textContent = '建议写法';
+
+        const suggestBtn = document.createElement('button');
+        suggestBtn.className = 'copy-btn';
+        suggestBtn.textContent = '复制选题说明';
+        suggestBtn.addEventListener('click', () => {
+          const suggestions = (idea.suggestions || []).join('\n- ');
+          const full = `【选题方向】\n${idea.angleTitle || ''}\n\n【适合写】\n${idea.summary || ''}\n\n【用户痛点】\n- ${(idea.painPoints || []).join('\n- ')}\n\n【写作建议】\n- ${suggestions}`;
+          navigator.clipboard.writeText(full).then(() => {
+            showToast('已复制这个选题方向，可以丢进内容生产 Agent 继续写～');
+          });
+        });
+
+        footer.appendChild(meta);
+        footer.appendChild(suggestBtn);
+        card.appendChild(footer);
+
+        radarList.appendChild(card);
+      });
+
+      radarResultsMeta.innerHTML =
+        `已围绕情绪关键词 <strong>「${keyword}」</strong> 生成 <strong>${ideas.length}</strong> 个选题方向，可直接作为系列内容的骨架。`;
+    }
+
+    if (radarGenerateBtn) {
+      radarGenerateBtn.addEventListener('click', async () => {
+        const raw = radarKeywordInput.value.trim();
+        if (!raw) {
+          radarKeywordInput.focus();
+          showToast('先输入一个情绪关键词哦');
+          return;
+        }
+
+        const keyword = raw.replace(/[#\s]/g, '');
+        radarGenerateBtn.disabled = true;
+        radarGenerateBtn.textContent = '分析中…';
+        radarResultsMeta.textContent = 'AI 正在扫描这个话题的痛点和高频切入角度…';
+
+        try {
+          const data = await callAgent('radar', { keyword });
+          renderRadarResults(data, keyword);
+        } catch (err) {
+          console.error(err);
+          showToast(err.message || '分析失败，请稍后再试');
+        } finally {
+          radarGenerateBtn.disabled = false;
+          radarGenerateBtn.textContent = '扫描爆款切入角度';
+        }
+      });
+
+      radarKeywordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          radarGenerateBtn.click();
+        }
+      });
+    }
+
+    // Agent 3：标题测试
+    const titlesTopicInput = document.getElementById('titles-topic');
+    const titlesGenerateBtn = document.getElementById('titles-generate-btn');
+    const titlesResultsMeta = document.getElementById('titles-results-meta');
+    const titlesList = document.getElementById('titles-list');
+
+    function renderTitlesResults(data, topic) {
+      titlesList.innerHTML = '';
+      const titles = data.titles || [];
+
+      titles.forEach((item, index) => {
+        const card = document.createElement('article');
+        card.className = 'post-card';
+
+        const indexBadge = document.createElement('div');
+        indexBadge.className = 'post-index';
+        indexBadge.textContent = `方案 ${index + 1}`;
+        card.appendChild(indexBadge);
+
+        const titleEl = document.createElement('h3');
+        titleEl.className = 'post-title';
+        titleEl.textContent = item.title || '';
+        card.appendChild(titleEl);
+
+        const bodyEl = document.createElement('div');
+        bodyEl.className = 'post-body';
+        bodyEl.textContent = item.why || '';
+        card.appendChild(bodyEl);
+
+        const footer = document.createElement('div');
+        footer.className = 'post-footer';
+
+        const styleMap = {
+          suspense: '悬念型',
+          empathy: '共鸣型',
+          practical: '干货型',
+          contrast: '反差型',
+          curiosity: '好奇心型',
+          list: '清单型',
+          story: '故事型',
+          other: '混合型'
+        };
+
+        const meta = document.createElement('span');
+        meta.textContent = styleMap[item.style] || '标题方案';
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.textContent = '复制标题';
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(item.title || '').then(() => {
+            showToast('标题已复制，可以直接用在封面或笔记标题里');
           });
         });
 
@@ -1018,67 +1399,46 @@
         footer.appendChild(copyBtn);
         card.appendChild(footer);
 
-        postsList.appendChild(card);
+        titlesList.appendChild(card);
       });
 
-      resultsMeta.innerHTML = `已根据 <strong>「${keyword}」</strong> 生成 <strong>${posts.length}</strong> 条可直接使用的小红书文案，可按需二次修改。`;
+      titlesResultsMeta.innerHTML =
+        `已围绕主题 <strong>「${topic}」</strong> 生成 <strong>${titles.length}</strong> 个不同风格的标题，并附上爆款逻辑说明。`;
     }
 
-    if (keywordChips) {
-      keywordChips.addEventListener('click', (e) => {
-        const chip = e.target.closest('.chip');
-        if (!chip) return;
-        keywordInput.value = chip.textContent.trim();
-        keywordInput.focus();
+    if (titlesGenerateBtn) {
+      titlesGenerateBtn.addEventListener('click', async () => {
+        const raw = titlesTopicInput.value.trim();
+        if (!raw) {
+          titlesTopicInput.focus();
+          showToast('先输入一个主题哦');
+          return;
+        }
+
+        const topic = raw;
+        titlesGenerateBtn.disabled = true;
+        titlesGenerateBtn.textContent = '生成中…';
+        titlesResultsMeta.textContent = 'AI 正在为这个主题拆分不同风格的标题…';
+
+        try {
+          const data = await callAgent('titles', { topic });
+          renderTitlesResults(data, topic);
+        } catch (err) {
+          console.error(err);
+          showToast(err.message || '生成失败，请稍后再试');
+        } finally {
+          titlesGenerateBtn.disabled = false;
+          titlesGenerateBtn.textContent = '生成 8 个标题方案';
+        }
+      });
+
+      titlesTopicInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          titlesGenerateBtn.click();
+        }
       });
     }
-
-    if (styleChips) {
-      styleChips.addEventListener('click', (e) => {
-        const chip = e.target.closest('.chip');
-        if (!chip) return;
-        styleChips.querySelectorAll('.chip').forEach(c => c.classList.remove('primary'));
-        chip.classList.add('primary');
-      });
-    }
-
-    generateBtn.addEventListener('click', generatePosts);
-
-    keywordInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        generatePosts();
-      }
-    });
-
-    countSelect.addEventListener('change', () => {
-      countLabel.textContent = countSelect.value;
-    });
-
-    copyAllBtn.addEventListener('click', () => {
-      const cards = postsList.querySelectorAll('.post-card');
-      if (!cards.length) {
-        showToast('还没有内容可复制，先生成一批文案吧');
-        return;
-      }
-
-      const blocks = [];
-      cards.forEach((card, index) => {
-        const title = card.querySelector('.post-title')?.textContent || '';
-        const body = card.querySelector('.post-body')?.textContent || '';
-        const tags = Array.from(card.querySelectorAll('.tag')).map(t => t.textContent).join(' ');
-
-        blocks.push(
-          `第${index + 1}条\n\n【标题】\n${title}\n\n【正文】\n${body}\n\n【话题标签】\n${tags}`
-        );
-      });
-
-      const text = blocks.join('\n\n------------------------\n\n');
-
-      navigator.clipboard.writeText(text).then(() => {
-        showToast('本页所有文案已复制，去小红书排版就行啦');
-      });
-    });
   </script>
 </body>
 </html>
