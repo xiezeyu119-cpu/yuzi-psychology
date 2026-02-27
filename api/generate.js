@@ -4,10 +4,10 @@ export default async function handler(req, res) {
     return;
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     res.status(500).json({
-      error: '服务端未配置 ANTHROPIC_API_KEY',
+      error: '服务端未配置 GROQ_API_KEY',
       hint: '请在 Vercel 项目 Settings → Environment Variables 中配置'
     });
     return;
@@ -116,38 +116,30 @@ export default async function handler(req, res) {
       return;
     }
 
-    const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
+    const apiRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json'
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'llama-3.1-8b-instant',
         max_tokens: maxTokens,
-        system,
         messages: [
-          {
-            role: 'user',
-            content: userPrompt
-          }
+          { role: 'system', content: system },
+          { role: 'user', content: userPrompt }
         ]
       })
     });
 
     if (!apiRes.ok) {
       const errorText = await apiRes.text();
-      res.status(apiRes.status).json({ error: 'Anthropic API error', detail: errorText });
+      res.status(apiRes.status).json({ error: 'Groq API error', detail: errorText });
       return;
     }
 
     const data = await apiRes.json();
-    const textContent = (data.content || [])
-      .filter(part => part.type === 'text')
-      .map(part => part.text)
-      .join('\n')
-      .trim();
+    const textContent = (data.choices?.[0]?.message?.content || '').trim();
 
     let parsed;
     try {
